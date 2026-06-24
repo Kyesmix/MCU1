@@ -82,3 +82,47 @@ void display_person(const Person* p) {
     printf("  ID: %d | Nom: %s | Prénom: %s | Âge: %d\n",
            p->id, p->name, p->firstname, p->age);
 }
+
+/* Trouve l'index d'une personne par ID */
+int find_person_index(Person* persons, int count, int id) {
+    for (int i = 0; i < count; i++) {
+        if (persons[i].id == id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/* Supprime une personne par ID */
+int delete_person(Person* persons, int* count, int id) {
+    int index = find_person_index(persons, *count, id);
+    
+    if (index == -1) {
+        return 0; /* Personne non trouvée */
+    }
+
+    /* Décaler tous les éléments après l'index */
+    for (int i = index; i < *count - 1; i++) {
+        persons[i] = persons[i + 1];
+    }
+
+    (*count)--;
+    return 1; /* Succès */
+}
+
+/* Modifie une personne par ID */
+int update_person(Person* persons, int count, int id, const char* name, const char* firstname, int age) {
+    int index = find_person_index(persons, count, id);
+    
+    if (index == -1) {
+        return 0; /* Personne non trouvée */
+    }
+
+    /* Modifier les champs */
+    process_name(name, persons[index].name);
+    process_firstname(firstname, persons[index].firstname);
+    persons[index].age = age;
+    persons[index].timestamp = time(NULL);
+
+    return 1; /* Succès */
+}

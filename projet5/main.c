@@ -24,12 +24,14 @@ int main() {
         printf("\nNombre de personnes: %d\n\n", person_count);
         printf("1. Ajouter une personne\n");
         printf("2. Afficher toutes les personnes\n");
-        printf("3. Sauvegarder (texte + binaire)\n");
-        printf("4. Charger depuis fichier binaire\n");
-        printf("5. Quitter\n\n");
+        printf("3. Modifier une personne\n");
+        printf("4. Supprimer une personne\n");
+        printf("5. Sauvegarder (texte + binaire)\n");
+        printf("6. Charger depuis fichier binaire\n");
+        printf("7. Quitter\n\n");
         printf("Choix: ");
         scanf("%d", &choice);
-        getchar(); /* Enlève le '\n' du buffer */
+        getchar(); /* Enlève le '\\n' du buffer */
 
         switch (choice) {
             case 1: {
@@ -81,6 +83,101 @@ int main() {
 
             case 3: {
                 if (person_count == 0) {
+                    print_error("Aucune personne à modifier");
+                    break;
+                }
+
+                print_header("MODIFIER UNE PERSONNE");
+                printf("Personnes disponibles:\n");
+                for (int i = 0; i < person_count; i++) {
+                    display_person(&persons[i]);
+                }
+
+                int id;
+                printf("\nEntrez l'ID de la personne à modifier: ");
+                scanf("%d", &id);
+                getchar();
+
+                int index = find_person_index(persons, person_count, id);
+                if (index == -1) {
+                    print_error("Personne non trouvée!");
+                    break;
+                }
+
+                char name[MAX_NAME_LENGTH];
+                char firstname[MAX_FIRSTNAME_LENGTH];
+                int age;
+
+                printf("\nDonnées actuelles:\n");
+                display_person(&persons[index]);
+
+                print_info("Entrez le nouveau nom:");
+                fgets(name, MAX_NAME_LENGTH, stdin);
+                name[strcspn(name, "\n")] = '\0';
+
+                print_info("Entrez le nouveau prénom:");
+                fgets(firstname, MAX_FIRSTNAME_LENGTH, stdin);
+                firstname[strcspn(firstname, "\n")] = '\0';
+
+                print_info("Entrez le nouvel âge:");
+                scanf("%d", &age);
+                getchar();
+
+                if (update_person(persons, person_count, id, name, firstname, age)) {
+                    print_success("Personne modifiée!");
+                    printf("\nNouvelles données:\n");
+                    display_person(&persons[index]);
+                } else {
+                    print_error("Erreur lors de la modification!");
+                }
+                break;
+            }
+
+            case 4: {
+                if (person_count == 0) {
+                    print_error("Aucune personne à supprimer");
+                    break;
+                }
+
+                print_header("SUPPRIMER UNE PERSONNE");
+                printf("Personnes disponibles:\n");
+                for (int i = 0; i < person_count; i++) {
+                    display_person(&persons[i]);
+                }
+
+                int id;
+                printf("\nEntrez l'ID de la personne à supprimer: ");
+                scanf("%d", &id);
+                getchar();
+
+                int index = find_person_index(persons, person_count, id);
+                if (index == -1) {
+                    print_error("Personne non trouvée!");
+                    break;
+                }
+
+                printf("\nPersonne à supprimer:\n");
+                display_person(&persons[index]);
+
+                printf("\nÊes-vous sûr? (O/N): ");
+                char confirm;
+                scanf("%c", &confirm);
+                getchar();
+
+                if (confirm == 'O' || confirm == 'o') {
+                    if (delete_person(persons, &person_count, id)) {
+                        print_success("Personne supprimée!");
+                    } else {
+                        print_error("Erreur lors de la suppression!");
+                    }
+                } else {
+                    print_info("Suppression annulée");
+                }
+                break;
+            }
+
+            case 5: {
+                if (person_count == 0) {
                     print_error("Aucune personne à sauvegarder");
                 } else {
                     save_text_file("personnes.txt", persons, person_count);
@@ -90,7 +187,7 @@ int main() {
                 break;
             }
 
-            case 4: {
+            case 6: {
                 Person* loaded = NULL;
                 int count = load_binary_file("personnes.bin", &loaded);
                 if (count > 0) {
@@ -103,7 +200,7 @@ int main() {
                 break;
             }
 
-            case 5: {
+            case 7: {
                 print_info("Au revoir!");
                 free(persons);
                 return 0;

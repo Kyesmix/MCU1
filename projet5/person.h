@@ -21,5 +21,8 @@ void process_name(const char* input, char* output);
 void process_firstname(const char* input, char* output);
 void free_person(Person* p);
 void display_person(const Person* p);
+int find_person_index(Person* persons, int count, int id);
+int delete_person(Person* persons, int* count, int id);
+int update_person(Person* persons, int count, int id, const char* name, const char* firstname, int age);
 
 #endif
